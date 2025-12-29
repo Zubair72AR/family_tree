@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(git -C /c/Users/DELL/Documents/GitHub/family-tree log --oneline -10)",
+      "Bash(tree:*)",
+      "Bash(git -C /c/Users/DELL/Documents/GitHub/family-tree show --name-status)",
+      "Bash(git -C /c/Users/DELL/Documents/GitHub/family-tree diff HEAD~1..HEAD --name-only)",
+      "Bash(grep:*)",
+      "Bash(git -C /c/Users/DELL/Documents/GitHub/family-tree status)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
