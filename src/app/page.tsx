@@ -1,3 +1,3 @@
-export default function page() {
-  return <div>Welcome to the Family Tree</div>;
+export default function Home() {
+  return <div>Welcome to Family Tree</div>;
 }
