@@ -16,14 +16,16 @@ export default async function VerifyEmailPage() {
   if (user.emailVerified) redirect("/dashboard");
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 text-center">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold">Verify your email</h1>
-          <p className="text-muted-foreground">
-            A verification email was sent to your inbox.
-          </p>
-        </div>
+    <main className="flex min-h-[600px] items-center justify-center px-4">
+      <div className="space-y-1 text-center">
+        <h1 className="font-bodoni text-3xl">Verify your email</h1>
+        <p className="text-foreground/65 mb-4 text-sm">
+          A verification email has been sent to <strong>{user.email}</strong>.
+          <span className="block">
+            Open your inbox and click the link to verify your account. Didn’t
+            get it? Use the button below to resend.
+          </span>
+        </p>
         <ResendVerificationButton email={user.email} />
       </div>
     </main>

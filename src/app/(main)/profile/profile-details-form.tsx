@@ -80,7 +80,7 @@ export function ProfileDetailsForm({ user }: ProfileDetailsFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile Details</CardTitle>
+        <CardTitle className="font-bodoni text-xl">Profile Details</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -122,7 +122,7 @@ export function ProfileDetailsForm({ user }: ProfileDetailsFormProps) {
                 <UserAvatar
                   name={user.name}
                   image={imagePreview}
-                  className="size-16"
+                  className="size-18 border"
                 />
                 <Button
                   type="button"

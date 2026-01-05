@@ -14,7 +14,7 @@ export default function NavigationLink() {
   ];
 
   return (
-    <div className="flex items-center justify-center gap-6 py-2.5">
+    <div className="flex items-center justify-center gap-1">
       {navItems.map((item, idx) => {
         const isActive = pathname === item.href;
         return (
@@ -22,8 +22,8 @@ export default function NavigationLink() {
             key={idx}
             href={item.href}
             className={cn(
-              "hover:text-primary font-bodoni text-sm text-nowrap capitalize transition-colors duration-300 ease-in",
-              isActive ? "text-primary" : "text-background",
+              "hover:bg-background/5 text-background font-bodoni px-4 py-2.5 text-sm text-nowrap capitalize transition-colors duration-300 ease-in",
+              isActive ? "bg-background/5" : "",
             )}
           >
             {item.label}

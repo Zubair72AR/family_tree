@@ -21,7 +21,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    // requireEmailVerification: true, // Only if you want to block login completely
+    requireEmailVerification: true, // Only if you want to block login completely
     async sendResetPassword({ user, url }) {
       await sendEmail({
         to: user.email,
@@ -54,6 +54,10 @@ export const auth = betterAuth({
     },
     additionalFields: {
       role: {
+        type: "string",
+        input: false,
+      },
+      createdByAdminID: {
         type: "string",
         input: false,
       },

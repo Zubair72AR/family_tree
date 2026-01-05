@@ -1,7 +1,6 @@
 "use client";
 
-import { GitHubIcon } from "@/components/icons/GitHubIcon";
-import { GoogleIcon } from "@/components/icons/GoogleIcon";
+import { FcGoogle } from "react-icons/fc";
 import { LoadingButton } from "@/components/loading-button";
 import { PasswordInput } from "@/components/password-input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { FaGithub } from "react-icons/fa6";
+import Image from "next/image";
 
 const signInSchema = z.object({
   email: z.email({ message: "Please enter a valid email" }),
@@ -96,10 +97,26 @@ export function SignInForm() {
 
   return (
     <Card className="w-full max-w-md">
+      <Image
+        src="/ft_logo.svg"
+        alt="Family Tree Logo"
+        width={150}
+        height={50}
+        className="h-14 w-auto dark:hidden"
+      />
+      <Image
+        src="/ft_logo_white.svg"
+        alt="Family Tree Logo"
+        width={150}
+        height={50}
+        className="hidden h-14 w-auto dark:block"
+      />
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
+        <CardTitle className="font-bodoni text-lg md:text-2xl">
+          Sign In
+        </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Enter your email below to login to your account
+          Sign in to access your family tree account.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -183,7 +200,7 @@ export function SignInForm() {
                 disabled={loading}
                 onClick={() => handleSocialSignIn("google")}
               >
-                <GoogleIcon width="0.98em" height="1em" />
+                <FcGoogle />
                 Sign in with Google
               </Button>
 
@@ -194,7 +211,7 @@ export function SignInForm() {
                 disabled={loading}
                 onClick={() => handleSocialSignIn("github")}
               >
-                <GitHubIcon />
+                <FaGithub />
                 Sign in with Github
               </Button>
             </div>

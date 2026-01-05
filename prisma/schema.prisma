@@ -20,7 +20,8 @@ model User {
   email         String
   emailVerified Boolean
   image         String?
-  role          String?
+  role          String?   @default("admin")
+  createdByAdminID String?
   createdAt     DateTime
   updatedAt     DateTime
   sessions      Session[]

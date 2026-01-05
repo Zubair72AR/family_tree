@@ -65,7 +65,7 @@ export function PasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Change Password</CardTitle>
+        <CardTitle className="font-bodoni text-xl">Change Password</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>

@@ -29,9 +29,9 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12">
       <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-muted-foreground">
+        <div className="space-y-1">
+          <h1 className="font-bodoni text-3xl">Dashboard</h1>
+          <p className="text-foreground/65 mb-4 text-sm">
             Welcome back! Here&apos;s your account overview.
           </p>
         </div>
@@ -50,11 +50,11 @@ function ProfileInformation({ user }: ProfileInformationProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <UserIcon className="size-5" />
           Profile Information
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-foreground/65 text-sm">
           Your account details and current status
         </CardDescription>
       </CardHeader>
@@ -64,7 +64,7 @@ function ProfileInformation({ user }: ProfileInformationProps) {
             <UserAvatar
               name={user.name}
               image={user.image}
-              className="size-32 sm:size-24"
+              className="size-32 border sm:size-24"
             />
             {user.role && (
               <Badge>
@@ -76,16 +76,16 @@ function ProfileInformation({ user }: ProfileInformationProps) {
 
           <div className="flex-1 space-y-4">
             <div>
-              <h3 className="text-2xl font-semibold">{user.name}</h3>
-              <p className="text-muted-foreground">{user.email}</p>
+              <h3 className="font-bodoni text-2xl">{user.name}</h3>
+              <p className="text-foreground/65 text-sm">{user.email}</p>
             </div>
 
-            <div className="space-y-2">
-              <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <div className="space-y-1">
+              <div className="text-foreground/65 flex items-center gap-2 text-sm">
                 <CalendarDaysIcon className="size-4" />
                 Member Since
               </div>
-              <p className="font-medium">
+              <p className="text-sm font-medium">
                 {format(user.createdAt, "MMMM d, yyyy")}
               </p>
             </div>
@@ -98,17 +98,17 @@ function ProfileInformation({ user }: ProfileInformationProps) {
 
 function EmailVerificationAlert() {
   return (
-    <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800/50 dark:bg-yellow-950/30">
-      <div className="flex items-center justify-between">
+    <div className="border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800/50 dark:bg-yellow-950/30">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
-          <MailIcon className="size-5 text-yellow-600 dark:text-yellow-400" />
-          <span className="text-yellow-800 dark:text-yellow-200">
+          <MailIcon className="size-6 text-yellow-600 dark:text-yellow-400" />
+          <span className="text-sm text-yellow-800 dark:text-yellow-200">
             Please verify your email address to access all features.
           </span>
         </div>
-        <Button size="sm" asChild>
-          <Link href="/verify-email">Verify Email</Link>
-        </Button>
+        <Link href="/verify-email">
+          <Button>Verify Email</Button>
+        </Link>
       </div>
     </div>
   );

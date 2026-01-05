@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { passwordSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -82,8 +83,24 @@ export function SignUpForm() {
 
   return (
     <Card className="w-full max-w-md">
+      <Image
+        src="/ft_logo.svg"
+        alt="Family Tree Logo"
+        width={150}
+        height={50}
+        className="h-14 w-auto dark:hidden"
+      />
+      <Image
+        src="/ft_logo_white.svg"
+        alt="Family Tree Logo"
+        width={150}
+        height={50}
+        className="hidden h-14 w-auto dark:block"
+      />
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
+        <CardTitle className="font-bodoni text-lg md:text-2xl">
+          Sign Up
+        </CardTitle>
         <CardDescription className="text-xs md:text-sm">
           Enter your information to create an account
         </CardDescription>

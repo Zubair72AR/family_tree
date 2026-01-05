@@ -42,16 +42,12 @@ export function ResendVerificationButton({
         </div>
       )}
       {error && (
-        <div role="alert" className="text-sm text-red-600">
+        <div role="alert" className="text-destructive text-sm">
           {error}
         </div>
       )}
 
-      <LoadingButton
-        onClick={resendVerificationEmail}
-        className="w-full"
-        loading={isLoading}
-      >
+      <LoadingButton onClick={resendVerificationEmail} loading={isLoading}>
         Resend verification email
       </LoadingButton>
     </div>

@@ -8,17 +8,17 @@ export default function UnauthorizedPage() {
   const pathname = usePathname();
 
   return (
-    <main className="flex grow items-center justify-center px-4 text-center">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold">401 - Unauthorized</h1>
-          <p className="text-muted-foreground">Please sign in to continue.</p>
+    <main className="mx-auto grid min-h-[600px] w-full max-w-6xl place-items-center px-4 py-12">
+      <div className="space-y-6 text-center">
+        <div className="space-y-1">
+          <h1 className="font-bodoni text-3xl">401 - Unauthorized</h1>
+          <p className="text-foreground/65 mb-4 text-sm">
+            Please sign in to continue.
+          </p>
         </div>
-        <div>
-          <Button asChild>
-            <Link href={`/sign-in?redirect=${pathname}`}>Sign in</Link>
-          </Button>
-        </div>
+        <Link href={`/sign-in?redirect=${pathname}`}>
+          <Button variant="primary">Sign in</Button>
+        </Link>
       </div>
     </main>
   );

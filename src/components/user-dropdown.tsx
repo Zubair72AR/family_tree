@@ -7,7 +7,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,29 +15,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { isValidImageUrl } from "@/lib/isValidImageUrl";
 
 interface UserDropdownProps {
   user: User;
 }
 
 export function UserDropdown({ user }: UserDropdownProps) {
+  const imageSrc = isValidImageUrl(user.image) ? user.image : null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          {user.image ? (
+        <button>
+          {imageSrc ? (
             <Image
-              src={user.image}
-              alt={user.name}
-              width={16}
-              height={16}
-              className="rounded-full object-cover"
+              src={imageSrc}
+              alt={user.name ?? "User"}
+              width={30}
+              height={30}
+              className="h-8 w-8 rounded-full border object-cover"
             />
           ) : (
-            <UserIcon />
+            <UserIcon className="size-6 stroke-2" />
           )}
-          <span className="max-w-[12rem] truncate">{user.name}</span>
-        </Button>
+          {/* <span className="max-w-[12rem] truncate">{user.name}</span> */}
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>{user.email}</DropdownMenuLabel>

@@ -25,8 +25,10 @@ export function DeleteApplication() {
       <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-4">
         <div className="space-y-3">
           <div>
-            <h2 className="text-destructive font-medium">Delete Application</h2>
-            <p className="text-muted-foreground text-sm">
+            <h2 className="text-destructive font-semibold">
+              Delete Application
+            </h2>
+            <p className="text-foreground/65 text-sm">
               This action will delete the entire application. This cannot be
               undone.
             </p>

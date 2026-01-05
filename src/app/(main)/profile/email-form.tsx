@@ -59,7 +59,7 @@ export function EmailForm({ currentEmail }: EmailFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Change Email</CardTitle>
+        <CardTitle className="font-bodoni text-xl">Change Email</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>

@@ -8,10 +8,10 @@ export const metadata: Metadata = {
 export default function ForgotPasswordPage() {
   return (
     <main className="flex min-h-svh items-center justify-center px-4">
-      <div className="space-y-6 w-full">
+      <div className="w-full space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold">Forgot password</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-bodoni text-3xl">Forgot password</h1>
+          <p className="text-foreground/65 text-sm">
             Enter your email address and we&apos;ll send you a link to reset
             your password.
           </p>

@@ -19,7 +19,7 @@ export default async function ResetPasswordPage({
       {token ? (
         <ResetPasswordUI token={token} />
       ) : (
-        <div role="alert" className="text-red-600">
+        <div role="alert" className="text-destructive font-bodoni text-lg">
           Token is missing.
         </div>
       )}
@@ -35,8 +35,10 @@ function ResetPasswordUI({ token }: ResetPasswordUIProps) {
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold">Reset password</h1>
-        <p className="text-muted-foreground">Enter your new password below.</p>
+        <h1 className="font-bodoni text-3xl">Reset password</h1>
+        <p className="text-foreground/65 text-sm">
+          Please enter your new password below to securely update your account.
+        </p>
       </div>
       <ResetPasswordForm token={token} />
     </div>
