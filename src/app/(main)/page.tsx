@@ -1,54 +1,66 @@
-import betterAuthLogo from "@/assets/better_auth_logo.png";
-import codingInFlowLogo from "@/assets/coding_in_flow_logo.jpg";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
+import { getSignedUrl } from "@/actions/getSignedUrl";
+import AddFamilyHead from "@/components/Home/AddFamilyHead";
+import NoMemberUI from "@/components/Home/NoMemberUI";
+import NotSignedInCTA from "@/components/Home/NotSignedInCTA";
+import { getServerSession } from "@/lib/get-session";
+import { fetchFamilyHead, fetchProfiles } from "@/lib/supabase/fetch";
 
-export default function Home() {
+export default async function HomePage() {
+  // Check if user is signed in
+  const session = await getServerSession();
+
+  if (!session) {
+    // User not signed in → show logo + tagline + sign in button
+    return <NotSignedInCTA />;
+  }
+
+  // User is signed in → fetch all profiles for this user
+  const profiles = await fetchProfiles();
+  // Fetch Family Head
+  const familyHeads = await fetchFamilyHead();
+
+  // If no member is added yet
+  if (profiles.length === 0 && !profiles) {
+    return <NoMemberUI />;
+  }
+
+  // family head profile ids
+  const familyHeadIds = new Set(familyHeads.map((fh) => fh.profile_id));
+
+  // only profiles NOT in familyHeads
+  const availableProfiles = profiles.filter((p) => !familyHeadIds.has(p.id));
+
+  // Profile Photo
+  const profilesWithSignedPhotos = await Promise.all(
+    availableProfiles.map(async (profile) => ({
+      id: profile.id,
+      name: profile.name_eng, // use name_eng as name
+      gender: profile.gender, // optional
+      fatherName: profile.father_name ?? null, // optional nullable
+      father_id: profile.father_id,
+      children_count: profile.children_count,
+      date_of_birth: profile.date_of_birth,
+      date_of_death: profile.date_of_death,
+      photo: profile.profile_photo
+        ? await getSignedUrl(profile.profile_photo)
+        : null,
+    })),
+  );
+
+  // Family Head Profile Photo
+  const familyHeadsWithSignedPhotos = await Promise.all(
+    familyHeads.map(async (familyHead) => ({
+      ...familyHead,
+      profile_photo: familyHead.profile_photo
+        ? await getSignedUrl(familyHead.profile_photo)
+        : null,
+    })),
+  );
+
   return (
-    <main className="flex min-h-svh items-center justify-center px-4">
-      <div className="mx-auto max-w-3xl text-center">
-        <div className="mb-8 flex items-center justify-center gap-4">
-          <Image
-            src={codingInFlowLogo}
-            alt="Coding in Flow logo"
-            width={80}
-            height={80}
-            className="border-muted rounded-full border"
-          />
-          <span className="text-muted-foreground text-2xl font-bold">+</span>
-          <Image
-            src={betterAuthLogo}
-            alt="Better Auth logo"
-            width={80}
-            height={80}
-            className="border-muted rounded-full border"
-          />
-        </div>
-        <h1 className="text-3xl font-semibold sm:text-4xl">
-          Better-Auth Tutorial
-        </h1>
-        <p className="text-muted-foreground mt-3 text-base text-balance sm:text-lg">
-          Learn how to handle authentication in Next.js using Better-Auth with
-          this tutorial by{" "}
-          <Link
-            href="https://www.youtube.com/c/codinginflow?sub_confirmation=1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            Coding in Flow
-          </Link>
-        </p>
-        <div className="mx-auto mt-6 flex max-w-sm flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button asChild>
-            <Link href="/dashboard">Go to Dashboard</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-        </div>
-      </div>
-    </main>
+    <AddFamilyHead
+      profiles={profilesWithSignedPhotos}
+      familyHeads={familyHeadsWithSignedPhotos}
+    />
   );
 }

@@ -10,7 +10,7 @@ export default function Loading() {
         </div>
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="flex-1">
-            <div className="bg-card rounded-lg border p-6 shadow-sm">
+            <div className="bg-card border p-6 shadow-sm">
               <div className="space-y-3">
                 <Skeleton className="h-6.5 w-40" />
                 <div className="space-y-2">
@@ -26,7 +26,7 @@ export default function Loading() {
             </div>
           </div>
           <div className="flex-1 space-y-6">
-            <div className="bg-card rounded-lg border p-6 shadow-sm">
+            <div className="bg-card border p-6 shadow-sm">
               <div className="space-y-3">
                 <Skeleton className="h-6.5 w-32" />
                 <div className="space-y-2">
@@ -36,7 +36,7 @@ export default function Loading() {
                 <Skeleton className="h-10 w-full" />
               </div>
             </div>
-            <div className="bg-card rounded-lg border p-6 shadow-sm">
+            <div className="bg-card border p-6 shadow-sm">
               <div className="space-y-3">
                 <Skeleton className="h-6.5 w-40" />
                 <div className="space-y-2">

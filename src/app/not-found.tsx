@@ -9,7 +9,7 @@ export default async function NotFound({
   buttonHref,
 }: NotFoundProps) {
   return (
-    <main className="mx-auto grid min-h-[600px] w-full max-w-6xl place-items-center px-4 py-12">
+    <main className="mx-auto grid min-h-[600px] w-full max-w-4xl place-items-center px-4">
       <div className="space-y-6 text-center">
         <div className="space-y-1">
           <h1 className="font-bodoni text-3xl">{title ?? "404 Not Found"}</h1>

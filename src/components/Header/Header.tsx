@@ -33,6 +33,7 @@ export default async function Header() {
             alt="Family Tree Logo"
             width={150}
             height={50}
+            priority
             className="h-12 w-auto md:h-20 dark:hidden"
           />
           <Image

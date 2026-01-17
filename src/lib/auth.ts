@@ -61,6 +61,10 @@ export const auth = betterAuth({
         type: "string",
         input: false,
       },
+      lineage_id: {
+        type: "string",
+        input: false,
+      },
     },
   },
   hooks: {

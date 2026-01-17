@@ -11,11 +11,11 @@ export default function DashboardLoading() {
 
         <Skeleton className="h-16 w-full" />
 
-        <div className="rounded-lg border p-6">
+        <div className="border p-6">
           <div className="space-y-4">
             <div>
               <div className="flex items-center gap-2">
-                <Skeleton className="h-5 w-5 rounded-full" />
+                <Skeleton className="h-5 w-5" />
                 <Skeleton className="h-6 w-40" />
               </div>
               <Skeleton className="mt-2 h-4 w-64" />
@@ -23,7 +23,7 @@ export default function DashboardLoading() {
 
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <div className="flex flex-col items-center gap-3">
-                <Skeleton className="size-32 rounded-full sm:size-24" />
+                <Skeleton className="size-32 sm:size-24" />
                 <Skeleton className="h-5 w-20" />
               </div>
 
@@ -35,7 +35,7 @@ export default function DashboardLoading() {
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Skeleton className="h-4 w-4 rounded-full" />
+                    <Skeleton className="h-4 w-4" />
                     <Skeleton className="h-4 w-24" />
                   </div>
                   <Skeleton className="h-5 w-40" />

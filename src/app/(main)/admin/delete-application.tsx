@@ -22,7 +22,7 @@ export function DeleteApplication() {
 
   return (
     <div className="max-w-md">
-      <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-4">
+      <div className="border-destructive/20 bg-destructive/5 border p-4">
         <div className="space-y-3">
           <div>
             <h2 className="text-destructive font-semibold">
