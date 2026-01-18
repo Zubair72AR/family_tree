@@ -34,7 +34,7 @@ export default function ContactIconInfo({
         ></span>
       </div>
       <div>
-        <p className={cn("text-xs text-nowrap opacity-50", textClass)}>
+        <p className={cn("text-xs text-nowrap opacity-65", textClass)}>
           {text}
         </p>
         <p
