@@ -55,7 +55,7 @@ export default async function Header() {
         </div>
       </div>
       <nav className="bg-foreground mx-auto hidden md:block">
-        <NavigationLink />
+        <NavigationLink role={user.role} />
       </nav>
     </header>
   );

@@ -50,7 +50,6 @@ export default function NewProfileAdd({ allProfiles }: Props) {
   const [isAlive, setIsAlive] = useState(true);
   const [dod, setDod] = useState<string | null>(null);
   const [notes, setNotes] = useState<string | null>(null);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   // Relations
@@ -82,14 +81,6 @@ export default function NewProfileAdd({ allProfiles }: Props) {
     }
 
     setPhotoFile(file);
-    try {
-      const url = await uploadPhoto(file);
-      setPhotoUrl(url);
-    } catch (error: any) {
-      toast.error("Upload Failed", {
-        description: error?.message || "Something went wrong",
-      });
-    }
   }
 
   // IMage Choose File Reset Clear
@@ -151,6 +142,13 @@ export default function NewProfileAdd({ allProfiles }: Props) {
     try {
       setIsSaving(true); // start loading
 
+      let uploadedUrl = null; // use existing URL if any
+
+      // ✅ Upload image here if a new file is selected
+      if (photoFile) {
+        uploadedUrl = await uploadPhoto(photoFile);
+      }
+
       const newProfile = await addProfile({
         name_eng: nameEng.trim(),
         name_native_lang: nameNative.trim(),
@@ -165,7 +163,7 @@ export default function NewProfileAdd({ allProfiles }: Props) {
         spouse_id: spouseId,
         date_of_birth: dob ? new Date(dob) : null,
         date_of_death: dod ? new Date(dod) : null,
-        profile_photo: photoUrl || null,
+        profile_photo: uploadedUrl || null, // use uploaded image
         notes: notes?.trim() || null,
       });
 
@@ -196,7 +194,6 @@ export default function NewProfileAdd({ allProfiles }: Props) {
       setDob(null);
       setDod(null);
       setNotes(null);
-      setPhotoUrl(null);
       setPhotoFile(null);
       // Reset the file input manually
       if (fileInputRef.current) {
@@ -352,7 +349,7 @@ export default function NewProfileAdd({ allProfiles }: Props) {
             e.target.files && handlePhotoUpload(e.target.files[0])
           }
         />
-        {photoFile && photoUrl && (
+        {photoFile && (
           <Image
             src={URL.createObjectURL(photoFile)}
             alt="Profile Photo"

@@ -201,13 +201,13 @@
 
 /* Scroll Bar Selector */
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 9px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--muted-foreground) / 50;
-  border-radius: 0px;
+  background-color: var(--muted-foreground) / 75;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-track {

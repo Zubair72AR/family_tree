@@ -1,9 +1,26 @@
 import { getSignedUrl } from "@/actions/getSignedUrl";
+import NotFound from "@/app/not-found";
 import NewProfileAdd from "@/components/AllProfile/NewProfileAdd";
+import { getServerSession } from "@/lib/get-session";
 import { fetchProfiles } from "@/lib/supabase/fetch";
 import { notFound } from "next/navigation";
 
 export default async function AddPersonPage() {
+  // Get Session - User
+  const session = await getServerSession();
+  const user = session?.user;
+
+  if (user?.role === "viewer")
+    return (
+      <NotFound
+        title="Permission Required"
+        description="You don’t have permission to add new family members. Please contact the family admin if you believe this is a mistake."
+        buttonLabel="Go Back"
+        buttonHref="/people"
+      />
+    );
+
+  // Fetch Profiles
   const profiles = await fetchProfiles();
 
   if (!profiles) return notFound();

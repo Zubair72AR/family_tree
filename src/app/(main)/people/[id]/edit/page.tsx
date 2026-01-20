@@ -1,5 +1,7 @@
 import { getSignedUrl } from "@/actions/getSignedUrl";
+import NotFound from "@/app/not-found";
 import EditProfileForm from "@/components/AllProfile/EditProfileForm";
+import { getServerSession } from "@/lib/get-session";
 import { fetchProfileByID, fetchProfiles } from "@/lib/supabase/fetch";
 import { notFound } from "next/navigation";
 
@@ -8,6 +10,20 @@ interface EditPageProps {
 }
 
 export default async function EditProfilePage({ params }: EditPageProps) {
+  // Get Session - User
+  const session = await getServerSession();
+  const user = session?.user;
+
+  if (user?.role === "viewer")
+    return (
+      <NotFound
+        title="Permission Required"
+        description="You don’t have permission to add new family members. Please contact the family admin if you believe this is a mistake."
+        buttonLabel="Go Back"
+        buttonHref="/people"
+      />
+    );
+
   const { id } = await params;
 
   // Fetch all profiles once

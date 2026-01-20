@@ -99,7 +99,7 @@ export default function AddFamilyHead({
   return (
     <div className="pad-x mx-auto w-full max-w-6xl py-8">
       {/* Header */}
-      <div className="mb-6 flex flex-col items-end justify-between gap-2 sm:flex-row">
+      <div className="mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
         <div>
           <h1 className="font-bodoni text-3xl">Family Heads</h1>
           <p className="text-foreground/65 text-sm">

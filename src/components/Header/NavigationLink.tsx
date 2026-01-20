@@ -4,18 +4,25 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function NavigationLink() {
+type NavigationLinkProps = {
+  role: string;
+};
+
+export default function NavigationLink({ role }: NavigationLinkProps) {
   const pathname = usePathname();
   // Define the nav items
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/people", label: "People" },
     { href: "/people/new", label: "Add Person" },
+    { href: "/admin/new-user", label: "share" },
   ];
 
   return (
     <div className="flex items-center justify-center gap-1">
       {navItems.map((item, idx) => {
+        if (item.href === "/people/new" && role === "viewer") return null;
+        if (item.href === "/admin/new-user" && role !== "admin") return null;
         const isActive = pathname === item.href;
         return (
           <Link

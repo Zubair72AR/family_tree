@@ -3,6 +3,7 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { getServerSession } from "@/lib/get-session";
 import {
+  AdminLineage,
   FamilyHeadWithRelatives,
   Profile,
   ProfileWithRelatives,
@@ -199,4 +200,24 @@ export async function fetchFamilyHead(): Promise<FamilyHeadWithRelatives[]> {
   if (error) throw error;
 
   return (data || []) as FamilyHeadWithRelatives[];
+}
+
+// fetch lineage id dropdown for admin new user
+export async function fetchAdminLineages(): Promise<AdminLineage[]> {
+  const { adminId } = await getAdminId();
+
+  const { data, error } = await supabaseAdmin
+    .from("lineage_usage_summary")
+    .select(
+      `
+      lineage_id,
+      lineage_name,
+      total_profiles
+    `,
+    )
+    .eq("admin_id", adminId);
+
+  if (error) throw error;
+
+  return data as AdminLineage[];
 }

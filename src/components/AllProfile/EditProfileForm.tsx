@@ -54,7 +54,6 @@ export default function EditProfileForm({ allProfiles, ProfileEdit }: Props) {
   const [dod, setDod] = useState(ProfileEdit.date_of_death || null);
   const [isAlive, setIsAlive] = useState(!ProfileEdit.date_of_death);
   const [notes, setNotes] = useState(ProfileEdit.notes || null);
-  const [photoUrl, setPhotoUrl] = useState(ProfileEdit.profile_photo || null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const [casteId, setCasteId] = useState(ProfileEdit.caste_id || null);
@@ -85,14 +84,6 @@ export default function EditProfileForm({ allProfiles, ProfileEdit }: Props) {
     }
 
     setPhotoFile(file);
-    try {
-      const url = await uploadPhoto(file);
-      setPhotoUrl(url);
-    } catch (err: any) {
-      toast.error("Upload Failed", {
-        description: err?.message || "Something went wrong",
-      });
-    }
   };
 
   // Returns the main type of duplicate: "name", "father", "mother" or null
@@ -134,6 +125,13 @@ export default function EditProfileForm({ allProfiles, ProfileEdit }: Props) {
 
     setIsSaving(true);
 
+    let uploadedUrl = ProfileEdit.profile_photo; // use existing URL if any
+
+    // ✅ Upload image here if a new file is selected
+    if (photoFile) {
+      uploadedUrl = await uploadPhoto(photoFile);
+    }
+
     try {
       const updatedData = {
         name_eng: nameEng.trim(),
@@ -149,7 +147,7 @@ export default function EditProfileForm({ allProfiles, ProfileEdit }: Props) {
         spouse_id: spouseId,
         date_of_birth: dob ? new Date(dob) : null,
         date_of_death: isAlive ? null : dod ? new Date(dod) : null,
-        profile_photo: photoUrl || null,
+        profile_photo: uploadedUrl || null, // use uploaded image
         notes: notes?.trim() || null,
       };
 
@@ -221,7 +219,7 @@ export default function EditProfileForm({ allProfiles, ProfileEdit }: Props) {
             e.target.files && handlePhotoUpload(e.target.files[0])
           }
         />
-        {photoFile && photoUrl ? (
+        {photoFile ? (
           <Image
             src={URL.createObjectURL(photoFile)}
             alt="Profile Photo"

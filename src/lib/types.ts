@@ -112,6 +112,8 @@ export type DropDownProfile = {
   fatherName?: string | null;
   photo?: string | null;
 };
+
+// Family Head Drop Down
 export type FamilyHeadDropDOwn = {
   id: string;
   name: string;
@@ -122,4 +124,11 @@ export type FamilyHeadDropDOwn = {
   father_id?: string | null;
   children_count: number;
   photo: string | null;
+};
+
+// Fetch Lineage Name ID and Number od Lineage used in Profile for creating new user
+export type AdminLineage = {
+  lineage_id: string;
+  lineage_name: string;
+  total_profiles: number;
 };
