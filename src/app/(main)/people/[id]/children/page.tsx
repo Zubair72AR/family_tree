@@ -1,4 +1,3 @@
-import ProfileCard from "@/components/AllProfile/ProfileCard";
 import { fetchProfiles } from "@/lib/supabase/fetch";
 import { getSignedUrl } from "@/actions/getSignedUrl";
 import NotFound from "@/app/not-found";
@@ -6,6 +5,7 @@ import Link from "next/link";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import ProfileAvatar from "@/components/AllProfile/ProfileAvatar";
+import RelativeCard from "@/components/AllProfile/RelativeCard";
 
 type ChildrenPageProps = {
   params: { id: string };
@@ -34,25 +34,17 @@ export default async function PersonChildren({ params }: ChildrenPageProps) {
   const isMale = person.gender === "male";
 
   // Get children based on gender
-  const children = profiles.filter((p) =>
-    isMale ? p.father_id === id : p.mother_id === id,
-  );
-
-  // Transform photos (signed URLs)
-  const profilesWithPhotos = await Promise.all(
-    children.map(async (p) => ({
-      ...p,
-      profile_photo: p.profile_photo
-        ? await getSignedUrl(p.profile_photo)
-        : null,
-    })),
-  );
-  const personWithPhoto = {
-    ...person,
-    profile_photo: person.profile_photo
-      ? await getSignedUrl(person.profile_photo)
-      : null,
-  };
+  const children = profiles
+    .filter((p) => (isMale ? p.father_id === id : p.mother_id === id))
+    .sort((a, b) => {
+      const dateA = a.date_of_birth
+        ? new Date(a.date_of_birth).getTime()
+        : Infinity;
+      const dateB = b.date_of_birth
+        ? new Date(b.date_of_birth).getTime()
+        : Infinity;
+      return dateA - dateB;
+    });
 
   // 👉 If no Child found
   if (!children || children.length === 0)
@@ -66,18 +58,18 @@ export default async function PersonChildren({ params }: ChildrenPageProps) {
     );
 
   return (
-    <div className="py-8">
-      <div className="pad-x mx-auto mb-4 flex max-w-6xl items-center gap-2 sm:gap-4">
+    <div className="pad-x mx-auto my-8 flex w-full max-w-6xl flex-col items-center">
+      <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
         {/* Profile Photo */}
         <ProfileAvatar
           href={`/people/${id}`}
-          src={personWithPhoto.profile_photo}
-          alt={`${personWithPhoto.name_eng} Profile Photo`}
-          gender={personWithPhoto.gender}
+          src={await getSignedUrl(person.profile_photo)}
+          alt={`${person.name_eng} Profile Photo`}
+          gender={person.gender}
           className="max-w-44"
         />
 
-        <div>
+        <div className="text-center sm:text-left">
           <p className="text-foreground/65 text-sm font-light">Children of</p>
 
           <h1 className="font-bodoni flex items-center gap-1 text-2xl sm:text-3xl">
@@ -86,39 +78,39 @@ export default async function PersonChildren({ params }: ChildrenPageProps) {
               className="hover:text-primary"
               title="View Profile Details"
             >
-              {isMale ? "Mr. " : "Mrs. "}
-              {personWithPhoto.name_eng}
+              {isMale ? "Mr. " : "Ms. "}
+              {person.name_eng}
             </Link>
-            {!personWithPhoto.date_of_death && (
+            {!person.date_of_death && (
               <InfoTooltip label="This person is alive">
                 <RiVerifiedBadgeFill className="mt-1 size-4 text-green-500" />
               </InfoTooltip>
             )}
           </h1>
-          {personWithPhoto.father_name && (
+          {person.father_name && (
             <p className="text-foreground/65 text-sm font-light">
               {isMale ? "S/o " : "D/o"}
               <Link
-                href={`/people/${personWithPhoto.father_id}`}
+                href={`/people/${person.father_id}`}
                 className="hover:text-primary"
                 title="View Profile Details"
               >
                 <span className="font-semibold">
-                  {isMale ? "Mr. " : "Mrs. "} {personWithPhoto.father_name}
+                  {isMale ? "Mr. " : "Ms. "} {person.father_name}
                 </span>
               </Link>
             </p>
           )}
-          {personWithPhoto.spouse_name && (
+          {person.spouse_name && (
             <p className="text-foreground/65 text-sm font-light">
               {isMale ? "Husband of " : "Wife of "}
               <Link
-                href={`/people/${personWithPhoto.spouse_id}`}
+                href={`/people/${person.spouse_id}`}
                 className="hover:text-primary"
                 title="View Profile Details"
               >
                 <span className="font-semibold">
-                  {isMale ? "Mrs. " : "Mr. "} {personWithPhoto.spouse_name}
+                  {isMale ? "Ms. " : "Mr. "} {person.spouse_name}
                 </span>
               </Link>
             </p>
@@ -126,35 +118,26 @@ export default async function PersonChildren({ params }: ChildrenPageProps) {
         </div>
       </div>
 
-      {/* Profile Grid */}
-      <div className="pad-x mx-auto grid max-w-6xl grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {profilesWithPhotos.map((p) => {
-          return (
-            <ProfileCard
-              key={p.id}
-              id={p.id}
-              profile_photo={p.profile_photo}
-              name_eng={p.name_eng}
-              name_native_lang={p.name_native_lang}
-              gender={p.gender}
-              caste={p.caste_name || null}
-              // fatherName={p.father_name || null}
-              // fatherID={p.father_id || null}
-              // motherName={p.mother_name || null}
-              // motherID={p.mother_id || null}
-              spouseName={p.spouse_name || null}
-              spouseID={p.spouse_id || null}
-              numChildren={p.children_count}
-              place_of_birth={p.place_of_birth_city || null}
-              date_of_birth={p.date_of_birth}
-              date_of_death={p.date_of_death}
-              education={p.education_degree || null}
-              occupation={p.occupation_name || null}
-              family_branch={p.lineage_branch_name || null}
-            />
-          );
-        })}
-      </div>
+      {/* Children Details */}
+      {children.length > 0 && (
+        <div>
+          <h2 className="font-bodoni mt-6 text-center text-3xl uppercase">
+            Children
+          </h2>
+          <div className="my-4 grid gap-x-2 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+            {children.map((child) => {
+              return (
+                <RelativeCard
+                  person={child}
+                  label={child.gender === "male" ? "Son" : "Daughter"}
+                  showSpouseOf
+                  key={child.id}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

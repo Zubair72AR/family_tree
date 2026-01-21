@@ -16,6 +16,7 @@ import ProfileName from "./ProfileName";
 import ProfileNameNative from "./ProfileNameNative";
 import ProfileInfoRow from "./ProfileInfoRow";
 import ProfileDetailRow from "./ProfileDetailRow";
+import DeleteProfileBtn from "./DeleteProfileBtn";
 
 type ProfileCardProps = {
   id: string;
@@ -39,6 +40,7 @@ type ProfileCardProps = {
   notes?: string | null;
   family_branch: string | null;
   className?: string;
+  role: string;
 };
 
 export default function ProfileCard({
@@ -63,6 +65,7 @@ export default function ProfileCard({
   notes,
   family_branch,
   className,
+  role,
 }: ProfileCardProps) {
   const router = useRouter();
   // Calculate Age
@@ -192,44 +195,21 @@ export default function ProfileCard({
               <Network /> Family Tree
             </Button>
           </Link>
-          <Link href={`/people/${id}/edit`}>
-            <Button
-              variant="ghost"
-              className="bg-accent hover:bg-foreground dark:hover:bg-foreground hover:text-background h-8 px-1 py-1"
-            >
-              <UserPen /> Edit
-            </Button>
-          </Link>
-          <Button
-            className="bg-accent hover:bg-destructive dark:hover:bg-destructive h-8 px-1 py-1 hover:text-white"
-            variant="ghost"
-            onClick={() => {
-              toast.warning("Confirm Delete", {
-                description: `"${name_eng}" will be permanently removed.`,
-                action: {
-                  label: "Yes, Delete",
-                  onClick: async () => {
-                    try {
-                      const deletedProfile = await deleteProfile(id);
-                      toast.info("Deleted Successfully", {
-                        description: `"${name_eng}" has been removed.`,
-                      });
-                      // Refresh server data to update UI
-                      router.refresh();
-                    } catch (err: any) {
-                      toast.error("Delete Failed", {
-                        description: err?.message || "Something went wrong",
-                      });
-                    }
-                  },
-                },
-                duration: 10000, // 10s for user to click
-              });
-            }}
-          >
-            <Trash2 />
-            Delete
-          </Button>
+          {role === "admin" ||
+            (role === "editor" && (
+              <Link href={`/people/${id}/edit`}>
+                <Button
+                  variant="ghost"
+                  className="bg-accent hover:bg-foreground dark:hover:bg-foreground hover:text-background h-8 px-1 py-1"
+                >
+                  <UserPen /> Edit
+                </Button>
+              </Link>
+            ))}
+          {role === "admin" ||
+            (role === "editor" && (
+              <DeleteProfileBtn profileId={id} profileName={name_eng} />
+            ))}
         </div>
       </div>
     </div>

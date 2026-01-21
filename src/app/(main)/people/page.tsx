@@ -2,8 +2,13 @@ import { fetchProfiles } from "@/lib/supabase/fetch";
 import { getSignedUrl } from "@/actions/getSignedUrl";
 import ProfilesClient from "@/components/AllProfile/ProfilesClient";
 import NotFound from "@/app/not-found";
+import { getServerSession } from "@/lib/get-session";
 
 export default async function ProfilesPage() {
+  // Get Session - User
+  const session = await getServerSession();
+  const user = session?.user;
+
   const profiles = await fetchProfiles();
 
   const profilesWithPhotos = await Promise.all(
@@ -26,5 +31,7 @@ export default async function ProfilesPage() {
       />
     );
 
-  return <ProfilesClient profiles={profilesWithPhotos} />;
+  return (
+    <ProfilesClient profiles={profilesWithPhotos} role={user?.role || ""} />
+  );
 }

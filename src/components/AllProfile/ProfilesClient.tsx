@@ -54,8 +54,10 @@ interface FilterOption {
 
 export default function ProfilesClient({
   profiles,
+  role,
 }: {
   profiles: ProfileWithRelatives[];
+  role: string;
 }) {
   const [filters, setFilters] = useState<Filters>({
     fathers: [],
@@ -530,6 +532,7 @@ export default function ProfilesClient({
             education={p.education_degree || null}
             occupation={p.occupation_name || null}
             family_branch={p.lineage_branch_name || null}
+            role={role}
           />
         ))}
       </div>

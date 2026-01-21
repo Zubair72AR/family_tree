@@ -28,7 +28,7 @@ export default function ProfileInfoRow({
         {emptyPlaceholder}
       </span>
     ) : (
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-1">
         {value}
         {showArrow && (
           <ArrowUpRight

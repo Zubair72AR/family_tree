@@ -22,3 +22,28 @@ export async function uploadPhoto(file: File) {
   // ✅ RETURN ONLY FILE PATH
   return fileName;
 }
+
+export async function uploadUserPhoto(file: File) {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}.${fileExt}`;
+  const fileBuffer = await file.arrayBuffer();
+
+  // Upload the file
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from("Public_User_Images") // your public bucket
+    .upload(fileName, Buffer.from(fileBuffer), {
+      contentType: file.type,
+      upsert: true,
+    });
+
+  if (uploadError) {
+    throw new Error("Photo upload failed: " + uploadError.message);
+  }
+
+  // ✅ Get public URL correctly
+  const { data } = supabaseAdmin.storage
+    .from("Public_User_Images")
+    .getPublicUrl(fileName);
+
+  return data.publicUrl; // <-- this is the full URL
+}

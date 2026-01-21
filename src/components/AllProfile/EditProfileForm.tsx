@@ -523,10 +523,10 @@ export default function EditProfileForm({ allProfiles, ProfileEdit }: Props) {
                 <div>
                   <p className="text-xl font-semibold">{d.profile.name_eng}</p>
                   <p className="text-sm leading-tight opacity-65">
-                    Father: {d.profile.father_name}
+                    Father: {d.profile.father_name || "-"}
                   </p>
                   <p className="text-sm leading-tight opacity-65">
-                    Mother: {d.profile.mother_name}
+                    Mother: {d.profile.mother_name || "-"}
                   </p>
                   <Link href={`/people/${d.profile.id}`}>
                     <Button className="mt-1 h-8 px-2" variant="outline">

@@ -8,7 +8,7 @@ export default function QuickLink() {
   const pathname = usePathname();
   // Define the nav items
   const navItems = [
-    { key: "reviews", href: "/reviews", label: "Reviews" },
+    // { key: "reviews", href: "/reviews", label: "Reviews" },
     { key: "privacy-policy", href: "/privacy-policy", label: "Privacy Policy" },
     {
       key: "terms-and-conditions",

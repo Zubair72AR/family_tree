@@ -3,7 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type ProfileAvatarProps = {
-  href: string;
+  href?: string; // make optional
   className?: string;
   src?: string | null;
   alt: string;
@@ -17,10 +17,12 @@ export default function ProfileAvatar({
   alt,
   gender,
 }: ProfileAvatarProps) {
+  const Wrapper: any = href ? Link : "div"; // conditional wrapper
+  const wrapperProps = href ? { href, title: "View Profile Details" } : {}; // only Link needs href/title
+
   return (
-    <Link
-      href={href}
-      title="View Profile Details"
+    <Wrapper
+      {...wrapperProps}
       className={cn(
         "border-border/50 overflow-hidden rounded-full border-8 transition-colors duration-300 ease-in",
         gender === "male"
@@ -43,6 +45,6 @@ export default function ProfileAvatar({
         priority={false}
         className="aspect-square object-cover transition-transform duration-150 ease-in hover:scale-115"
       />
-    </Link>
+    </Wrapper>
   );
 }

@@ -82,10 +82,6 @@ export function AdminUsersSection({ lineages }: Props) {
           <p className="text-foreground/65 text-sm">
             Create a user to securely share access to your family tree.
           </p>
-          <p className="text-foreground/65 text-sm">
-            A verification email will be sent to the user, allowing them to set
-            their password and log in to view the family tree you shared.
-          </p>
         </div>
 
         {users.length > 0 && (
@@ -113,97 +109,111 @@ export function AdminUsersSection({ lineages }: Props) {
         )}
       </div>
 
+      <div className="mb-6">
+        <p className="text-foreground/65 text-sm">
+          The user will receive a verification email to set their password and
+          sign in. Access is granted based on the assigned role. View-only users
+          can see the shared family tree, while editors can add, edit, or delete
+          profiles. Removing a user immediately revokes their access.
+        </p>
+      </div>
       {/* Users Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {users.length > 0 ? (
-          users.map((user, idx) => (
-            <Card key={idx} className="p-4">
-              <div className="text-center">
-                {/* Name */}
-                <p className="font-bodoni text-lg">{user.name}</p>
+      {loading ? (
+        <div className="bg-accent col-span-full grid h-48 place-items-center rounded-2xl border border-dashed">
+          <p className="text-foreground/65 text-sm">Loading user....</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {users.length > 0 ? (
+            users.map((user, idx) => (
+              <Card key={idx} className="p-4">
+                <div className="text-center">
+                  {/* Name */}
+                  <p className="font-bodoni text-lg">{user.name}</p>
 
-                <hr className="my-1" />
-                {/* Email */}
-                <p
-                  className={cn(
-                    "text-foreground/65 text-sm",
-                    user.emailVerified && "verifiedIcon [--icon-size:12px]",
-                  )}
-                >
-                  {user.email}
-                </p>
-
-                <hr className="my-1" />
-
-                {/* Role */}
-                <p className="text-foreground/65 text-sm">
-                  Role:{" "}
-                  <span
+                  <hr className="my-1" />
+                  {/* Email */}
+                  <p
                     className={cn(
-                      "px-2 py-0.5 text-xs text-white capitalize",
-                      user.role === "viewer" ? "bg-blue-500" : "bg-green-500",
+                      "text-foreground/65 text-sm",
+                      user.emailVerified && "verifiedIcon [--icon-size:12px]",
                     )}
                   >
-                    {user.role}
-                  </span>
-                </p>
-
-                <hr className="my-1" />
-                {/* Lineage or Full Tree */}
-
-                <p className="text-foreground/65 mb-4 text-sm">
-                  Access Type:{" "}
-                  <span className="line-clamp-1 block font-semibold">
-                    {user.lineage_id
-                      ? `${lineages.find((l) => l.lineage_id === user.lineage_id)?.lineage_name || user.lineage_id} Lineage`
-                      : "Full Tree"}
-                  </span>
-                </p>
-                {/* Delete Button */}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => handleDelete(user.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </Card>
-          ))
-        ) : (
-          // No users exist
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <div className="hover:bg-accent col-span-full cursor-pointer space-y-6 rounded-2xl border border-dashed px-6 py-20 text-center">
-                <div className="space-y-1">
-                  <h1 className="font-bodoni text-[26px]">
-                    No Users Added Yet
-                  </h1>
-                  <p className="text-foreground/65 mb-4 text-sm">
-                    Grant access to your family tree to relatives or
-                    collaborators.
+                    {user.email}
                   </p>
-                </div>
-                <Button variant="primary">Create User</Button>
-              </div>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create New Shared User</DialogTitle>
-                <DialogDescription>
-                  Grant access to your family tree by creating a new user.
-                </DialogDescription>
-              </DialogHeader>
 
-              <NewUserForm
-                lineages={lineages}
-                onUserCreated={handleUserCreated}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
+                  <hr className="my-1" />
+
+                  {/* Role */}
+                  <p className="text-foreground/65 text-sm">
+                    Role:{" "}
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 text-xs text-white capitalize",
+                        user.role === "viewer" ? "bg-blue-500" : "bg-green-500",
+                      )}
+                    >
+                      {user.role}
+                    </span>
+                  </p>
+
+                  <hr className="my-1" />
+                  {/* Lineage or Full Tree */}
+
+                  <p className="text-foreground/65 mb-4 text-sm">
+                    Access Type:{" "}
+                    <span className="line-clamp-1 block font-semibold">
+                      {user.lineage_id
+                        ? `${lineages.find((l) => l.lineage_id === user.lineage_id)?.lineage_name || user.lineage_id} Lineage`
+                        : "Full Tree"}
+                    </span>
+                  </p>
+                  {/* Delete Button */}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleDelete(user.id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </Card>
+            ))
+          ) : (
+            // No users exist
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <div className="hover:bg-accent col-span-full cursor-pointer space-y-6 rounded-2xl border border-dashed px-6 py-20 text-center">
+                  <div className="space-y-1">
+                    <h1 className="font-bodoni text-[26px]">
+                      No Users Added Yet
+                    </h1>
+                    <p className="text-foreground/65 mb-4 text-sm">
+                      Grant access to your family tree to relatives or
+                      collaborators.
+                    </p>
+                  </div>
+                  <Button variant="primary">Create User</Button>
+                </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Create New Shared User</DialogTitle>
+                  <DialogDescription>
+                    Grant access to your family tree by creating a new user.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <NewUserForm
+                  lineages={lineages}
+                  onUserCreated={handleUserCreated}
+                />
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+      )}
     </div>
   );
 }
