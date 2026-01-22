@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback, useEffect } from "react";
-import { Filters, ProfileWithRelatives } from "@/lib/types";
+import { Filters, ProfileWithRelativesNoNotes } from "@/lib/types";
 import ProfileCard from "./ProfileCard";
 
 import {
@@ -56,7 +56,7 @@ export default function ProfilesClient({
   profiles,
   role,
 }: {
-  profiles: ProfileWithRelatives[];
+  profiles: ProfileWithRelativesNoNotes[];
   role: string;
 }) {
   const [filters, setFilters] = useState<Filters>({
@@ -90,7 +90,7 @@ export default function ProfilesClient({
     const date = d instanceof Date ? d : new Date(d);
     return isNaN(date.getTime()) ? fallback : date.getTime();
   }, []);
-  const getAgeMs = useCallback((p: ProfileWithRelatives) => {
+  const getAgeMs = useCallback((p: ProfileWithRelativesNoNotes) => {
     if (!p.date_of_birth) return Infinity;
     const dob = new Date(p.date_of_birth).getTime();
     const endDate = p.date_of_death
@@ -223,7 +223,8 @@ export default function ProfilesClient({
     const hasFilters = Object.values(filters).some((f) => f.length);
     if (!hasFilters && !debouncedSearch) return profiles;
 
-    const result: { profile: ProfileWithRelatives; score: number }[] = [];
+    const result: { profile: ProfileWithRelativesNoNotes; score: number }[] =
+      [];
     for (const p of profiles) {
       let passed = true;
       if (
@@ -526,11 +527,8 @@ export default function ProfilesClient({
             spouseName={p.spouse_name || null}
             spouseID={p.spouse_id || null}
             numChildren={p.children_count}
-            place_of_birth={p.place_of_birth_city || null}
             date_of_birth={p.date_of_birth}
             date_of_death={p.date_of_death}
-            education={p.education_degree || null}
-            occupation={p.occupation_name || null}
             family_branch={p.lineage_branch_name || null}
             role={role}
           />

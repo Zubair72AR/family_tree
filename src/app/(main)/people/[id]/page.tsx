@@ -145,17 +145,16 @@ export default async function PersonID({ params }: PersonPageProps) {
             <Network /> Family Tree
           </Button>
         </Link>
-        {user?.role === "admin" ||
-          (user?.role === "editor" && (
-            <Link href={`/people/${id}/edit`}>
-              <Button
-                variant="ghost"
-                className="bg-accent hover:bg-foreground dark:hover:bg-foreground hover:text-background h-8 px-1 py-1"
-              >
-                <UserPen /> Edit
-              </Button>
-            </Link>
-          ))}
+        {(user?.role === "admin" || user?.role === "editor") && (
+          <Link href={`/people/${id}/edit`}>
+            <Button
+              variant="ghost"
+              className="bg-accent hover:bg-foreground dark:hover:bg-foreground hover:text-background h-8 px-1 py-1"
+            >
+              <UserPen /> Edit
+            </Button>
+          </Link>
+        )}
         {(user?.role === "admin" || user?.role === "editor") && (
           <DeleteProfileBtn profileId={id} profileName={profile.name_eng} />
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   ReactFlow,
   Node,
@@ -8,11 +8,9 @@ import {
   Controls,
   ReactFlowInstance,
   Panel,
-  Background,
-  BackgroundVariant,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { TreeProfile } from "@/lib/types";
+import { ProfileWithRelatives } from "@/lib/types";
 import { FamilyNode } from "./FamilyNode";
 import { NodeSearch } from "../node-search";
 import { Button } from "../ui/button";
@@ -21,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 // Tree node structure
 type TreeNode = {
-  profile: TreeProfile;
+  profile: ProfileWithRelatives;
   children: TreeNode[];
   x?: number;
   y?: number;
@@ -29,58 +27,30 @@ type TreeNode = {
 };
 
 interface TreeClientProps {
-  profiles: TreeProfile[];
+  profiles: ProfileWithRelatives[];
   focusId: string;
 }
 
 export default function TreeClient({ profiles, focusId }: TreeClientProps) {
-  // 1️⃣ Default auto collapsed (lineage based, one-time)
-  const [autoCollapsed, setAutoCollapsed] = useState<Set<string>>(new Set());
-
-  // 2️⃣ User manual collapse (never overridden)
   const [collapsedNodes, setCollapsedNodes] = useState<Set<string>>(new Set());
-
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   // Focus ID
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
   // Lineage Switch mode
   const [lineageMode, setLineageMode] = useState<"father" | "mother">("father");
-  const lastTouchedNodeRef = useRef<string | null>(null);
-  const interactionTypeRef = useRef<"init" | "lineage" | "toggle" | "search">(
-    "init",
-  );
 
   // Node Height
-  const LEVEL_HEIGHT = 420;
+  const LEVEL_HEIGHT = 400;
   const H_GAP = 15;
 
-  useEffect(() => {
-    const defaults = new Set<string>();
-
-    for (const p of profiles) {
-      if (lineageMode === "father" && p.gender === "female") {
-        defaults.add(p.id);
-      }
-
-      if (lineageMode === "mother" && p.gender === "male") {
-        defaults.add(p.id);
-      }
-    }
-
-    setAutoCollapsed(defaults);
-    setCollapsedNodes(new Set()); // reset manual only when lineage changes
-    interactionTypeRef.current = "lineage";
-    lastTouchedNodeRef.current = null;
-  }, [lineageMode, profiles]);
-
   // Get Node Width According to Child
-  const getNodeWidth = (profile: TreeProfile) => {
+  const getNodeWidth = (profile: ProfileWithRelatives) => {
     return profile.children_count > 0 || profile.spouse_id ? 315 : 150;
   };
 
   // --- 1️⃣ Find tree head ---
-  const findTreeHead = (focusId: string): TreeProfile | null => {
+  const findTreeHead = (focusId: string): ProfileWithRelatives | null => {
     let current = profiles.find((p) => p.id === focusId);
     if (!current) return null;
 
@@ -96,7 +66,7 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
   };
 
   //   Sort Children by DOB
-  const sortChildren = (children: TreeProfile[]) => {
+  const sortChildren = (children: ProfileWithRelatives[]) => {
     return [...children].sort((a, b) => {
       if (!a.date_of_birth || !b.date_of_birth) return 0;
       return (
@@ -106,8 +76,19 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
     });
   };
 
+  // --- Precompute children map ---
+  // const childrenMap = useMemo(() => {
+  //   const map = new Map<string, ProfileWithRelatives[]>();
+  //   for (const p of profiles) {
+  //     const key = lineageMode === "father" ? p.father_id : p.mother_id;
+  //     if (!key) continue;
+  //     if (!map.has(key)) map.set(key, []);
+  //     map.get(key)!.push(p);
+  //   }
+  //   return map;
+  // }, [profiles, lineageMode]);
   const childrenMap = useMemo(() => {
-    const map = new Map<string, TreeProfile[]>();
+    const map = new Map<string, ProfileWithRelatives[]>();
     for (const p of profiles) {
       // Add child to father map
       if (p.father_id) {
@@ -123,8 +104,16 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
     return map;
   }, [profiles]);
 
+  // --- 2️⃣ Build tree recursively ---
+  // const buildTree = (nodeProfile: ProfileWithRelatives): TreeNode => {
+  //   const childrenProfiles = sortChildren(
+  //     childrenMap.get(nodeProfile.id) || [],
+  //   );
+  //   const childrenNodes = childrenProfiles.map(buildTree);
+  //   return { profile: nodeProfile, children: childrenNodes };
+  // };
   const buildTree = (
-    nodeProfile: TreeProfile,
+    nodeProfile: ProfileWithRelatives,
     lineageMode: "father" | "mother",
     depth = 0,
   ): TreeNode => {
@@ -185,17 +174,12 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
     return { profile: nodeProfile, children: childrenNodes };
   };
 
-  const isCollapsed = useCallback(
-    (id: string) => autoCollapsed.has(id) || collapsedNodes.has(id),
-    [autoCollapsed, collapsedNodes],
-  );
-
   // --- 3️⃣ Layout tree recursively ---
   const layoutTree = (node: TreeNode, xOffset = 0, depth = 0): number => {
     const nodeWidth = getNodeWidth(node.profile);
     node.y = depth * LEVEL_HEIGHT;
 
-    if (node.children.length === 0 || isCollapsed(node.profile.id)) {
+    if (node.children.length === 0 || collapsedNodes.has(node.profile.id)) {
       node.x = xOffset;
       return xOffset + nodeWidth + H_GAP;
     }
@@ -233,22 +217,23 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
       data: {
         profile: node.profile,
         spouseProfile,
+        childCount: node.profile.children_count,
         onToggle: handleNodeClick,
-        isCollapsed: isCollapsed(node.profile.id),
-        totalWidth: getNodeWidth(node.profile),
+        isCollapsed: collapsedNodes.has(node.profile.id),
+        width: getNodeWidth(node.profile),
         focusId: focusId,
       },
     });
 
     for (const child of node.children) {
-      if (!isCollapsed(node.profile.id)) {
+      if (!collapsedNodes.has(node.profile.id)) {
         const strokeColor =
           child.profile.gender === "male" ? "#7c3aed" : "#ec4899"; // purple / pink
         edgesArr.push({
           id: `${node.profile.id}-${child.profile.id}`,
           source: node.profile.id,
           target: child.profile.id,
-          // type: "bezier",
+          type: "bezier",
           style: {
             stroke: strokeColor,
             strokeDasharray: 5,
@@ -262,22 +247,15 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
   };
 
   // --- 5️⃣ Collapse / expand ---
-  const handleNodeClick = useCallback((nodeId: string) => {
-    lastTouchedNodeRef.current = nodeId;
-    interactionTypeRef.current = "toggle";
-
-    setCollapsedNodes((prev) => {
-      const next = new Set(prev);
-      next.has(nodeId) ? next.delete(nodeId) : next.add(nodeId);
-      return next;
-    });
-
-    setAutoCollapsed((prev) => {
-      const next = new Set(prev);
-      next.delete(nodeId);
-      return next;
-    });
-  }, []);
+  const handleNodeClick = useCallback(
+    (nodeId: string) => {
+      const newSet = new Set(collapsedNodes);
+      if (newSet.has(nodeId)) newSet.delete(nodeId);
+      else newSet.add(nodeId);
+      setCollapsedNodes(newSet);
+    },
+    [collapsedNodes],
+  );
 
   // --- 6️⃣ Build nodes / edges whenever focusId or collapse changes ---
   useEffect(() => {
@@ -293,61 +271,34 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
 
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [focusId, collapsedNodes, lineageMode]);
+
+    if (rfInstance) {
+      // ✅ If user just collapsed/expanded node → show full tree
+      // ✅ If first load → focus node
+      if (collapsedNodes.size > 0) {
+        rfInstance.fitView({ padding: 0.2, includeHiddenNodes: true });
+      } else {
+        const focusNode = newNodes.find((n) => n.id === focusId);
+        if (focusNode) {
+          const focusProfile = profiles.find((p) => p.id === focusId);
+          const focusWidth = focusProfile ? getNodeWidth(focusProfile) : 150;
+
+          rfInstance.setCenter(
+            focusNode.position.x + focusWidth / 2,
+            focusNode.position.y + 150,
+            { zoom: 1, duration: 2000 },
+          );
+        }
+      }
+    }
+  }, [focusId, collapsedNodes, rfInstance, lineageMode]);
 
   const nodeTypes = {
     family: FamilyNode,
   };
 
-  useEffect(() => {
-    if (!rfInstance || nodes.length === 0) return;
-
-    const getNodeWidth = (node: Node) => {
-      const w = (node.data as { width?: number })?.width;
-      return typeof w === "number" ? w : 150;
-    };
-
-    // 🔹 Toggle collapse → pan only
-    if (interactionTypeRef.current === "toggle" && lastTouchedNodeRef.current) {
-      const id = lastTouchedNodeRef.current;
-      const node = nodes.find((n) => n.id === id);
-      if (!node) return;
-
-      rfInstance.setCenter(
-        node.position.x + getNodeWidth(node) / 2,
-        node.position.y + 500,
-        { zoom: 0.3, duration: 500 },
-      );
-      return;
-    }
-
-    // 🔹 Search → focus strongly
-    if (interactionTypeRef.current === "search" && lastTouchedNodeRef.current) {
-      const id = lastTouchedNodeRef.current;
-      const node = nodes.find((n) => n.id === id);
-      if (!node) return;
-
-      rfInstance.setCenter(
-        node.position.x + getNodeWidth(node) / 2,
-        node.position.y + 120,
-        { zoom: 1, duration: 1000 },
-      );
-      return;
-    }
-
-    // 🔹 Init / lineage → focus focusId
-    const focusNode = nodes.find((n) => n.id === focusId);
-    if (!focusNode) return;
-
-    rfInstance.setCenter(
-      focusNode.position.x + getNodeWidth(focusNode) / 2,
-      focusNode.position.y + 120,
-      { zoom: 1, duration: 1000 },
-    );
-  }, [nodes, rfInstance]);
-
   return (
-    <div className="bg-accent relative mx-auto h-full w-full">
+    <div className="bg-foreground/10 relative mx-auto h-full w-full">
       <div className="absolute top-16 right-3.5 z-50 text-xs shadow-md/25">
         <Button
           onClick={() => setLineageMode("father")}
@@ -387,7 +338,6 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
         zoomOnScroll
         zoomOnPinch
       >
-        <Background color="accent" />
         <Controls showInteractive={false} position="top-left" />
         <Panel position="top-right">
           <NodeSearch
@@ -395,9 +345,6 @@ export default function TreeClient({ profiles, focusId }: TreeClientProps) {
               // Focus the selected node in React Flow
               const profile = node.data.profile;
               const nodeWidth = profile ? getNodeWidth(profile) : 150;
-
-              interactionTypeRef.current = "search";
-              lastTouchedNodeRef.current = node.id;
 
               rfInstance?.setCenter(
                 node.position.x + nodeWidth / 2,

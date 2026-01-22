@@ -76,7 +76,7 @@ export function AdminUsersSection({ lineages }: Props) {
   return (
     <div className="pad-x mx-auto w-full max-w-6xl py-8">
       {/* Header */}
-      <div className="mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+      <div className="mb-6 flex flex-col justify-between gap-2 sm:flex-row">
         <div>
           <h1 className="font-bodoni text-3xl">Create Shared User</h1>
           <p className="text-foreground/65 text-sm">
@@ -115,6 +115,11 @@ export function AdminUsersSection({ lineages }: Props) {
           sign in. Access is granted based on the assigned role. View-only users
           can see the shared family tree, while editors can add, edit, or delete
           profiles. Removing a user immediately revokes their access.
+        </p>
+        <p className="text-destructive mt-2 text-sm">
+          *This access includes the full hierarchy of the lineage: spouses,
+          children, and children of children, even if some of them belong to
+          other lineages.
         </p>
       </div>
       {/* Users Grid */}
@@ -161,12 +166,33 @@ export function AdminUsersSection({ lineages }: Props) {
                   {/* Lineage or Full Tree */}
 
                   <p className="text-foreground/65 mb-4 text-sm">
-                    Access Type:{" "}
-                    <span className="line-clamp-1 block font-semibold">
-                      {user.lineage_id
-                        ? `${lineages.find((l) => l.lineage_id === user.lineage_id)?.lineage_name || user.lineage_id} Lineage`
-                        : "Full Tree"}
-                    </span>
+                    Access Scope:{" "}
+                    {user.lineage_id ? (
+                      <span>
+                        <span className="line-clamp-1 block font-semibold">
+                          {
+                            lineages.find(
+                              (line) => line.lineage_id === user.lineage_id,
+                            )?.lineage_name
+                          }{" "}
+                          Lineage{" "}
+                          <span className="text-destructive font-black">*</span>
+                        </span>
+                        <span className="text-destructive block text-xs">
+                          includes connected relatives: spouses & children*
+                        </span>
+                      </span>
+                    ) : (
+                      <span>
+                        <span className="line-clamp-1 block font-semibold">
+                          All Family Lineages{" "}
+                          <span className="font-black text-green-600">*</span>
+                        </span>
+                        <span className="block text-xs text-green-600">
+                          Full access to all Profiles across all Lineages.
+                        </span>
+                      </span>
+                    )}
                   </p>
                   {/* Delete Button */}
                   <Button

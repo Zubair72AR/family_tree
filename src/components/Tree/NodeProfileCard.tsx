@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { ProfileWithRelatives } from "@/lib/types";
+import { TreeProfile } from "@/lib/types";
 import DateDisplay from "../AllProfile/DateDisplay";
 import { cn } from "@/lib/utils";
+import ProfileAvatar from "../AllProfile/ProfileAvatar";
 
 interface NodeProfileCardProps {
-  profile: ProfileWithRelatives;
+  profile: TreeProfile;
   className?: string;
 }
 
@@ -23,31 +24,27 @@ export function NodeProfileCard({ profile, className }: NodeProfileCardProps) {
   return (
     <div className={cn("w-full px-1 py-2", className)}>
       {/* Profile Image */}
-      <div
-        className={cn(
-          "bg-background mx-auto w-[120px] overflow-hidden rounded-full border-3",
-          profile.gender === "male"
-            ? "border-[#784efd]/50"
-            : "border-[#ff277a]/50",
-        )}
-      >
-        <Image
-          src={profilePhoto}
-          alt={`${nameEng} Profile Photo`}
-          width={200}
-          height={200}
-          priority={false}
-          className="aspect-square object-cover transition-transform duration-150 ease-in hover:scale-115"
-        />
-      </div>
+      <ProfileAvatar
+        src={profilePhoto}
+        alt={`${profile.name_eng} Profile Photo`}
+        gender={profile.gender}
+        className="mx-auto w-[130px] border-2 bg-white"
+      />
 
       {/* Profile Details */}
       <div className="my-1 space-y-0.5 text-center">
         {/* Name in English */}
-        <p className="font-bodoni text-sm capitalize">{nameEng}</p>
+        <p
+          className={cn(
+            "font-bodoni text-sm capitalize",
+            profile.date_of_death ? "" : "verifiedIcon [--icon-size:10px]",
+          )}
+        >
+          {nameEng}
+        </p>
 
         {/* Name in Native Language */}
-        <p className="font-langs text-xs leading-none capitalize opacity-65">
+        <p className="font-langs text-xs leading-none capitalize opacity-75">
           {nameNative}
         </p>
 

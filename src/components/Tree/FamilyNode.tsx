@@ -1,19 +1,18 @@
 "use client";
 
 import { Handle, Position } from "@xyflow/react";
-import { ProfileWithRelatives } from "@/lib/types";
+import { TreeProfile } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Heart } from "lucide-react";
 import { NodeProfileCard } from "./NodeProfileCard";
 
 interface Props {
   data: {
-    profile: ProfileWithRelatives;
-    spouseProfile: ProfileWithRelatives | null;
-    childCount: number;
+    profile: TreeProfile;
+    spouseProfile: TreeProfile | null;
     onToggle: (id: string) => void;
     isCollapsed: boolean;
-    width: number;
+    totalWidth: number;
     focusId: string;
     highlight: boolean;
   };
@@ -23,25 +22,25 @@ export function FamilyNode({ data }: Props) {
   const {
     profile,
     spouseProfile,
-    childCount,
     onToggle,
     isCollapsed,
-    width,
+    totalWidth,
     focusId,
     highlight,
   } = data;
 
   return (
-    <div style={{ width: `${data.width}px` }}>
+    <div style={{ width: `${totalWidth}px` }}>
       {/* Parent handle */}
       <Handle
         type="target"
         position={Position.Top}
         style={{
-          left: data.width === 150 ? "50%" : "25%",
-          width: 12,
-          height: 12,
-          borderRadius: 6,
+          left: totalWidth === 150 ? "50%" : "25%",
+          top: 2,
+          width: 14,
+          height: 14,
+          borderRadius: 7,
           background: profile.gender === "male" ? "#784efd" : "#ff277a",
         }}
       />
@@ -50,12 +49,15 @@ export function FamilyNode({ data }: Props) {
       <div
         onClick={() => onToggle(profile.id)}
         className={cn(
-          "group hover:bg-primary hover:text-primary-foreground hover:border-primary border-background flex min-w-[150px] cursor-pointer items-center justify-between overflow-hidden rounded-4xl border-2 shadow-md/25",
+          "bg-background border-foreground/15 text-foreground group grid min-w-[150px] cursor-pointer overflow-hidden rounded-[27px] border border-y-6 shadow-md/25",
           highlight
-            ? "border-green-300 bg-green-600 text-green-100 shadow-[0_0_15px_3px_rgba(245,158,11,1)]"
+            ? "border-blue-900 bg-blue-800 text-white"
             : focusId === profile.id
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-background text-foreground",
+              ? "border-green-900 bg-green-700 text-white"
+              : profile.gender === "male"
+                ? "border-b-purple-500"
+                : "border-b-rose-500",
+          profile.spouse_id ? "grid-cols-2" : "",
         )}
       >
         {spouseProfile && (
@@ -72,16 +74,14 @@ export function FamilyNode({ data }: Props) {
         <NodeProfileCard
           profile={profile}
           className={cn(
-            "group-hover:border-black/25 group-hover:bg-black/50",
-            focusId === profile.id
-              ? "rounded-4xl bg-black/40"
-              : "rounded-4xl border",
+            "group-hover:bg-primary rounded-4xl group-hover:text-white",
+            profile.spouse_id && "border",
           )}
         />
         {spouseProfile && <NodeProfileCard profile={spouseProfile} />}
       </div>
 
-      {childCount > 0 && (
+      {profile.children_count > 0 && (
         <Handle
           type="source"
           position={Position.Bottom}
@@ -95,7 +95,7 @@ export function FamilyNode({ data }: Props) {
           className="cursor-pointer"
         >
           <div className="flex h-full w-full items-center justify-center gap-0.5 py-1 ps-1.5 text-xs text-white/75">
-            {childCount}
+            {profile.children_count}
             <ChevronDown
               className={cn("size-3.5", isCollapsed ? "" : "rotate-180")}
             />

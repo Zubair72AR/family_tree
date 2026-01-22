@@ -36,7 +36,7 @@ export type ProfileDisplay = {
   id: string;
   profile_photo: string | null;
   name_eng: string;
-  name_native_lang: string | null;
+  name_native_lang: string;
   gender: "male" | "female" | "other";
 
   caste_name?: string | null;
@@ -60,6 +60,25 @@ export type ProfileWithRelatives = ProfileDisplay & {
   father_name?: string | null;
   mother_name?: string | null;
   spouse_name?: string | null;
+};
+
+// New type without notes
+export type ProfileWithRelativesNoNotes = Omit<ProfileWithRelatives, "notes">;
+
+// Tree Profile
+export type TreeProfile = {
+  id: string;
+  name_eng: string;
+  name_native_lang: string;
+  gender: "male" | "female" | "other";
+  father_id?: string | null;
+  mother_id?: string | null;
+  spouse_id?: string | null;
+  date_of_birth: Date | null;
+  date_of_death: Date | null;
+  children_count: number;
+  profile_photo: string | null;
+  father_name?: string | null;
 };
 
 // Filtering Data Type

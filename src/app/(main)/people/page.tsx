@@ -13,7 +13,24 @@ export default async function ProfilesPage() {
 
   const profilesWithPhotos = await Promise.all(
     profiles.map(async (p) => ({
-      ...p,
+      id: p.id,
+      name_eng: p.name_eng,
+      name_native_lang: p.name_native_lang,
+      gender: p.gender,
+      caste_name: p.caste_name,
+      education_degree: p.education_degree,
+      occupation_name: p.occupation_name,
+      place_of_birth_city: p.place_of_birth_city,
+      lineage_branch_name: p.lineage_branch_name,
+      father_id: p.father_id,
+      mother_id: p.mother_id,
+      spouse_id: p.spouse_id,
+      date_of_birth: p.date_of_birth,
+      date_of_death: p.date_of_death,
+      children_count: p.children_count,
+      father_name: p.father_name,
+      mother_name: p.mother_name,
+      spouse_name: p.spouse_name,
       profile_photo: p.profile_photo
         ? await getSignedUrl(p.profile_photo)
         : null,

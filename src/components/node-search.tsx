@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/command";
 
 import { FamilyNodeData } from "@/lib/types";
+import Image from "next/image";
 
 type FamilyNode = Node<FamilyNodeData>;
 
@@ -110,20 +111,39 @@ export function NodeSearchInternal({
             ) : (
               <CommandGroup heading="Members">
                 {searchResults.map((node) => (
-                  <CommandItem key={node.id} onSelect={() => onSelect(node)}>
-                    <div className="flex">
-                      <span className="font-medium">
+                  <CommandItem
+                    key={node.data.profile.id}
+                    onSelect={() => onSelect(node)}
+                  >
+                    {node.data.profile.gender && (
+                      <Image
+                        src={
+                          node?.data.profile.profile_photo
+                            ? node?.data.profile.profile_photo
+                            : node?.data.profile.gender === "female"
+                              ? "/female_profile.svg"
+                              : "/male_profile.svg"
+                        }
+                        alt={node?.data.profile.name_eng || "Profile Photo"}
+                        width={50}
+                        height={50}
+                        priority={false}
+                        className="aspect-square rounded-lg border object-cover"
+                      />
+                    )}
+                    <span>
+                      <span className="text-foreground/65 text-base leading-tight font-semibold">
                         {node.data.profile.name_eng}
                       </span>
-                      <span className="font-medium">
-                        {node.data.profile.father_id}
-                      </span>
-                      {node.data.profile.name_native_lang && (
-                        <span className="font-langs text-xs opacity-70">
-                          {node.data.profile.name_native_lang}
-                        </span>
-                      )}
-                    </div>
+                      {node.data.profile.father_name &&
+                        node.data.profile.father_name != "Unknown" && (
+                          <span className="text-foreground/65 block text-sm leading-tight font-light">
+                            {node.data.profile.gender === "male"
+                              ? `S/o Mr. ${node.data.profile.father_name}`
+                              : `D/o Mr. ${node.data.profile.father_name}`}
+                          </span>
+                        )}
+                    </span>
                   </CommandItem>
                 ))}
               </CommandGroup>

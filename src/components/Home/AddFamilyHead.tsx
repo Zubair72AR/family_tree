@@ -45,12 +45,8 @@ export default function AddFamilyHead({
       setSavingId(id);
       await addFamilyHead(id);
       router.refresh();
-      toast.info("Family head added", {
-        description: "Profile added successfully.",
-        action: {
-          label: "View",
-          onClick: () => (window.location.href = `/people/${id}`),
-        },
+      toast.info("Profile added as Family Head", {
+        description: "The profile has been successfully added to Family Heads.",
       });
       setProId(null);
     } catch (err: any) {
@@ -84,7 +80,7 @@ export default function AddFamilyHead({
   }
 
   const suggestedHeads = profiles
-    .filter((p) => !p.father_id && p.children_count > 0) // root profiles only
+    .filter((p) => !p.father_id && p.children_count > 0 && p.gender === "male") // root profiles only
     .sort((a, b) => {
       if (a.date_of_birth && b.date_of_birth) {
         return (
@@ -155,7 +151,7 @@ export default function AddFamilyHead({
       </div>
 
       {/* Family Heads Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6">
         {familyHeads.length > 0 ? (
           familyHeads.map((head) => (
             <div
@@ -165,9 +161,9 @@ export default function AddFamilyHead({
               {/* Photo */}
               <Link
                 href={`/tree/${head.profile_id}`}
-                className="group bg-foreground/10 hover:bg-primary transition-color block h-full border p-1 duration-200 ease-in"
+                className="group bg-foreground/5 hover:bg-primary transition-color block h-full border p-1 duration-200 ease-in"
               >
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden rounded-2xl">
                   {removingId === head.profile_id && (
                     <div className="bg-foreground/50 text-background absolute inset-0 z-10 flex flex-col items-center justify-center text-sm">
                       <Loader2 className="mb-2 animate-spin" />
@@ -204,14 +200,14 @@ export default function AddFamilyHead({
                   {/* Name */}
                   <p
                     className={cn(
-                      "font-bodoni group-hover:text-primary-foreground transition-color text-lg capitalize duration-200 ease-in [--icon-size:12px]",
+                      "font-bodoni group-hover:text-primary-foreground transition-color line-clamp-2 text-sm capitalize duration-200 ease-in [--icon-size:10px]",
                       !head.date_of_death && "verifiedIcon",
                     )}
                   >
                     {head.name_eng}
                   </p>
                   {head.father_name && (
-                    <p className="text-foreground/65 transition-color text-xs leading-tight duration-200 ease-in group-hover:text-white">
+                    <p className="text-foreground/65 transition-color line-clamp-2 text-xs leading-tight duration-200 ease-in group-hover:text-white">
                       {head.gender === "male" ? "S/o " : "D/o "}
                       {head.father_name}
                     </p>

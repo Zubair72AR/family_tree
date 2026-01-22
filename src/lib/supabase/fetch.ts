@@ -94,48 +94,230 @@ export async function fetchFamilyBranches() {
 // -----------------------------
 export async function fetchProfiles(): Promise<ProfileWithRelatives[]> {
   const { adminId, role, createdByAdminID, lineage_id } = await getAdminId();
-
   const targetAdminId = role === "admin" ? adminId : createdByAdminID!;
-  const targetLineageId = lineage_id ?? null;
 
-  // Explicitly select all needed fields except admin_id and lineage_id
-  let query = supabaseAdmin
-    .from("profiles_with_relatives")
-    .select(
-      `
-      id,
-      profile_photo,
-      name_eng,
-      name_native_lang,
-      gender,
-      caste_name,
-      education_degree,
-      occupation_name,
-      place_of_birth_city,
-      lineage_branch_name,
-      father_id,
-      mother_id,
-      spouse_id,
-      date_of_birth,
-      date_of_death,
-      notes,
-      father_name,
-      mother_name,
-      spouse_name,
-      children_count
-    `,
-    )
-    .eq("admin_id", targetAdminId);
+  // 1️⃣ If no lineage_id, fetch all profiles for admin
+  if (!lineage_id) {
+    const { data, error } = await supabaseAdmin
+      .from("profiles_with_relatives")
+      .select("*")
+      .eq("admin_id", targetAdminId);
 
-  if (targetLineageId) {
-    query = query.eq("lineage_id", targetLineageId);
+    if (error) throw error;
+    return data || [];
   }
 
-  const { data, error } = await query;
-  if (error) throw error;
+  // --- HELPER FETCHES WITH MINIMAL FIELDS ---
+  async function fetchMinimalProfilesByIds(ids: string[]) {
+    if (!ids.length) return [];
+    const { data, error } = await supabaseAdmin
+      .from("profiles_with_relatives")
+      .select("id, spouse_id, father_id, mother_id, gender")
+      .in("id", ids);
 
-  return (data || []) as ProfileWithRelatives[];
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function fetchMinimalChildrenByParentIds(parentIds: string[]) {
+    if (!parentIds.length) return [];
+    const { data, error } = await supabaseAdmin
+      .from("profiles_with_relatives")
+      .select("id, spouse_id, father_id, mother_id, gender")
+      .or(
+        `father_id.in.(${parentIds.join(",")}),mother_id.in.(${parentIds.join(",")})`,
+      );
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  // 2️⃣ Start with lineage members (minimal fields)
+  const { data: lineageData, error: lineageError } = await supabaseAdmin
+    .from("profiles_with_relatives")
+    .select("id, spouse_id, father_id, mother_id, gender")
+    .eq("admin_id", targetAdminId)
+    .eq("lineage_id", lineage_id);
+
+  if (lineageError) throw lineageError;
+
+  let result: typeof lineageData = [];
+  let queue: typeof lineageData = lineageData || [];
+
+  while (queue.length) {
+    const currentLevel = queue;
+    queue = [];
+
+    result.push(...currentLevel);
+
+    // --- Fetch spouses ---
+    const spouseIds = currentLevel
+      .map((p) => p.spouse_id)
+      .filter(Boolean) as string[];
+    const spouses = await fetchMinimalProfilesByIds(spouseIds);
+
+    const newSpouses = spouses.filter(
+      (s) => !result.some((r) => r.id === s.id),
+    );
+    queue.push(...newSpouses);
+
+    // --- Fetch children ---
+    const parentIds: string[] = [];
+    for (const p of currentLevel) {
+      parentIds.push(p.id);
+      if (p.spouse_id) {
+        const spouse = spouses.find((s) => s.id === p.spouse_id);
+        if (!spouse) continue;
+        parentIds.push(spouse.id);
+      }
+    }
+
+    const children = await fetchMinimalChildrenByParentIds(parentIds);
+    for (const child of children) {
+      if (!result.some((r) => r.id === child.id)) {
+        const mother = spouses.find((s) => s.id === child.mother_id);
+        if (!mother || mother.gender !== "female") {
+          queue.push(child);
+        }
+        result.push(child);
+      }
+    }
+  }
+
+  // --- Deduplicate IDs ---
+  const uniqueIds = Array.from(new Set(result.map((p) => p.id)));
+
+  // --- FINAL FETCH: full profile info ---
+  if (!uniqueIds.length) return [];
+
+  const { data: fullProfiles, error: fullError } = await supabaseAdmin
+    .from("profiles_with_relatives")
+    .select("*")
+    .in("id", uniqueIds)
+    .eq("admin_id", targetAdminId); // still filter by admin
+
+  if (fullError) throw fullError;
+
+  return fullProfiles || [];
 }
+
+// export async function fetchProfiles(): Promise<ProfileWithRelatives[]> {
+//   const { adminId, role, createdByAdminID, lineage_id } = await getAdminId();
+//   const targetAdminId = role === "admin" ? adminId : createdByAdminID!;
+
+//   // 1️⃣ If no lineage_id, fetch all profiles for admin
+//   if (!lineage_id) {
+//     const { data, error } = await supabaseAdmin
+//       .from("profiles_with_relatives")
+//       .select("*")
+//       .eq("admin_id", targetAdminId);
+
+//     if (error) throw error;
+//     return data || [];
+//   }
+
+//   // Helper fetch by IDs
+//   async function fetchProfilesByIds(
+//     ids: string[],
+//   ): Promise<ProfileWithRelatives[]> {
+//     if (!ids.length) return [];
+//     const { data, error } = await supabaseAdmin
+//       .from("profiles_with_relatives")
+//       .select("*")
+//       .in("id", ids);
+//     if (error) throw error;
+//     return data || [];
+//   }
+
+//   // Helper fetch children by parent IDs
+//   async function fetchChildrenByParentIds(
+//     parentIds: string[],
+//   ): Promise<ProfileWithRelatives[]> {
+//     if (!parentIds.length) return [];
+//     const { data, error } = await supabaseAdmin
+//       .from("profiles_with_relatives")
+//       .select("*")
+//       .or(
+//         `father_id.in.(${parentIds.join(",")}),mother_id.in.(${parentIds.join(",")})`,
+//       );
+//     if (error) throw error;
+//     return data || [];
+//   }
+
+//   // 2️⃣ Start with lineage members
+//   const { data: lineageData, error: lineageError } = await supabaseAdmin
+//     .from("profiles_with_relatives")
+//     .select("*")
+//     .eq("admin_id", targetAdminId)
+//     .eq("lineage_id", lineage_id);
+
+//   if (lineageError) throw lineageError;
+
+//   let result: ProfileWithRelatives[] = [];
+//   let queue: ProfileWithRelatives[] = lineageData || [];
+
+//   while (queue.length) {
+//     const currentLevel = queue;
+//     queue = [];
+
+//     // Add current level to result
+//     result.push(...currentLevel);
+
+//     // 1️⃣ Fetch spouses of current level
+//     const spouseIds = currentLevel
+//       .map((p) => p.spouse_id)
+//       .filter(Boolean) as string[];
+
+//     const spouses = await fetchProfilesByIds(spouseIds);
+
+//     // Add spouses to next level if not already in result
+//     const newSpouses = spouses.filter(
+//       (s) => !result.some((r) => r.id === s.id),
+//     );
+//     queue.push(...newSpouses);
+
+//     // 2️⃣ Fetch children
+//     const parentIds: string[] = [];
+//     for (const p of currentLevel) {
+//       parentIds.push(p.id);
+//       // If spouse exists
+//       if (p.spouse_id) {
+//         const spouse = spouses.find((s) => s.id === p.spouse_id);
+//         if (!spouse) continue;
+//         // Female spouse rule: only fetch her children once
+//         if (spouse.gender === "female") {
+//           parentIds.push(spouse.id);
+//         } else {
+//           // Male spouse: include in recursive queue
+//           parentIds.push(spouse.id);
+//         }
+//       }
+//     }
+
+//     const children = await fetchChildrenByParentIds(parentIds);
+
+//     // Apply the female spouse stop rule
+//     const newChildren: ProfileWithRelatives[] = [];
+//     for (const child of children) {
+//       if (!result.some((r) => r.id === child.id)) {
+//         newChildren.push(child);
+
+//         // If child’s mother is female spouse, do not continue recursively
+//         const mother = spouses.find((s) => s.id === child.mother_id);
+//         if (!mother || mother.gender !== "female") {
+//           queue.push(child);
+//         }
+//       }
+//     }
+//   }
+
+//   // Deduplicate final result
+//   const uniqueProfiles = Array.from(
+//     new Map(result.map((p) => [p.id, p])).values(),
+//   );
+
+//   return uniqueProfiles;
+// }
 
 // FETCH SINGLE PROFILE
 export async function fetchProfileByID(id: string): Promise<Profile | null> {

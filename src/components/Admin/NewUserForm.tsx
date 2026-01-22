@@ -167,7 +167,7 @@ export function NewUserForm({ lineages, onUserCreated }: Props) {
               </FormControl>
               <FormLabel>
                 Full Tree Access
-                <span className="font-light">(All members visible)</span>
+                <span className="text-green-600">(All members visible)</span>
               </FormLabel>
             </FormItem>
           )}
@@ -182,9 +182,7 @@ export function NewUserForm({ lineages, onUserCreated }: Props) {
               <FormItem>
                 <FormLabel>
                   Select a lineage
-                  <span className="font-light">
-                    (Selected Members to Share)
-                  </span>
+                  <span className="text-destructive font-black">*</span>
                 </FormLabel>
                 <FormControl>
                   <ComboBoxLineage
@@ -194,6 +192,10 @@ export function NewUserForm({ lineages, onUserCreated }: Props) {
                     options={lineages}
                   />
                 </FormControl>
+                <span className="text-destructive text-sm font-medium">
+                  (Selected Members to Share — includes connected relatives:
+                  spouses & children)
+                </span>
                 <FormMessage />
               </FormItem>
             )}

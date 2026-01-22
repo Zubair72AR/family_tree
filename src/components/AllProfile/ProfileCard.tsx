@@ -32,12 +32,8 @@ type ProfileCardProps = {
   spouseName: string | null;
   spouseID: string | null;
   numChildren: number | null;
-  place_of_birth: string | null;
   date_of_birth: Date | null;
   date_of_death: Date | null;
-  education: string | null;
-  occupation: string | null;
-  notes?: string | null;
   family_branch: string | null;
   className?: string;
   role: string;
@@ -57,12 +53,8 @@ export default function ProfileCard({
   spouseName,
   spouseID,
   numChildren,
-  place_of_birth,
   date_of_birth,
   date_of_death,
-  education,
-  occupation,
-  notes,
   family_branch,
   className,
   role,
@@ -157,13 +149,6 @@ export default function ProfileCard({
         )}
 
         {caste && <ProfileDetailRow label="Caste:" value={caste} />}
-        {education && <ProfileDetailRow label="Education:" value={education} />}
-        {occupation && (
-          <ProfileDetailRow label="Profession:" value={occupation} />
-        )}
-        {place_of_birth && (
-          <ProfileDetailRow label="Born in:" value={place_of_birth} />
-        )}
         {date_of_birth && (
           <ProfileDetailRow
             label="Born on:"
@@ -195,21 +180,19 @@ export default function ProfileCard({
               <Network /> Family Tree
             </Button>
           </Link>
-          {role === "admin" ||
-            (role === "editor" && (
-              <Link href={`/people/${id}/edit`}>
-                <Button
-                  variant="ghost"
-                  className="bg-accent hover:bg-foreground dark:hover:bg-foreground hover:text-background h-8 px-1 py-1"
-                >
-                  <UserPen /> Edit
-                </Button>
-              </Link>
-            ))}
-          {role === "admin" ||
-            (role === "editor" && (
-              <DeleteProfileBtn profileId={id} profileName={name_eng} />
-            ))}
+          {(role === "admin" || role === "editor") && (
+            <Link href={`/people/${id}/edit`}>
+              <Button
+                variant="ghost"
+                className="bg-accent hover:bg-foreground dark:hover:bg-foreground hover:text-background h-8 px-1 py-1"
+              >
+                <UserPen /> Edit
+              </Button>
+            </Link>
+          )}
+          {(role === "admin" || role === "editor") && (
+            <DeleteProfileBtn profileId={id} profileName={name_eng} />
+          )}
         </div>
       </div>
     </div>
